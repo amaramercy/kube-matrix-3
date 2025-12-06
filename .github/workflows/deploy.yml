@@ -1,0 +1,87 @@
+name: Dev Deployment
+
+on:
+  workflow_dispatch:   # Manual trigger
+  push:
+    branches:
+      - dev           # Only run on dev branch
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Configure AWS credentials via OIDC role
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/github-oidc-role
+          aws-region: us-east-1
+
+      # 3️⃣ Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.8.4"
+
+      # 4️⃣ Terraform Init & Validate
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      # 5️⃣ Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan -var-file=envs/dev.tfvars
+
+    #   # 6️⃣ Terraform Apply (manual trigger only)
+    #   - name: Terraform Apply
+    #     if: github.event_name == 'workflow_dispatch'
+    #     run: terraform apply -var-file=envs/dev.tfvars -auto-approve
+
+    #   # 7️⃣ Configure kubectl for EKS
+    #   - name: Update Kubeconfig
+    #     if: github.event_name == 'workflow_dispatch'
+    #     run: |
+    #       CLUSTER_NAME=$(terraform output -raw eks_cluster_name)
+    #       aws eks update-kubeconfig --region us-east-1 --name $CLUSTER_NAME
+    #       kubectl get nodes
+
+    #   # 8️⃣ Sanity Test - Create namespace
+    #   - name: Create sanity-test namespace
+    #     if: github.event_name == 'workflow_dispatch'
+    #     run: |
+    #       kubectl create namespace sanity-test || echo "Namespace already exists"
+    #       kubectl get ns
+
+    #   # 9️⃣ Sanity Test - Deploy NGINX pod
+    #   - name: Deploy NGINX Pod
+    #     if: github.event_name == 'workflow_dispatch'
+    #     run: |
+    #       kubectl apply -f sanity-test/nginx-pod.yaml -n sanity-test
+    #       kubectl get pods -n sanity-test
+    #       kubectl logs nginx-test -n sanity-test
+
+    #   # 🔟 Sanity Test - NGINX Deployment
+    #   - name: Deploy NGINX Deployment
+    #     if: github.event_name == 'workflow_dispatch'
+    #     run: |
+    #       kubectl apply -f sanity-test/nginx-deploy.yaml -n sanity-test
+    #       kubectl get deploy -n sanity-test
+    #       kubectl get pods -n sanity-test
+
+    #   # 1️⃣1️⃣ Sanity Test - LoadBalancer Service
+    #   - name: Deploy LoadBalancer Service
+    #     if: github.event_name == 'workflow_dispatch'
+    #     run: |
+    #       kubectl apply -f sanity-test/service.yaml -n sanity-test
+    #       kubectl get svc -n sanity-test
