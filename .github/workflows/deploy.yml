@@ -44,8 +44,8 @@ jobs:
         run: terraform plan -var-file=envs/dev.tfvars
 
       # 6️⃣ Terraform Apply (manual trigger only)
-      - name: Terraform Destroy
-        run: terraform destroy -var-file=envs/dev.tfvars -auto-approve
+      - name: Terraform Apply
+        run: terraform apply -var-file=envs/dev.tfvars -auto-approve
 
     #   # 7️⃣ Configure kubectl for EKS
     #   - name: Update Kubeconfig
