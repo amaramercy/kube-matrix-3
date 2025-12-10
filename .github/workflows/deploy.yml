@@ -12,6 +12,11 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
+    # Prevent concurrent runs per environment
+    concurrency:
+      group: terraform-${{ matrix.env }}
+      cancel-in-progress: false
+
     strategy:
       matrix:
         env: [dev, stage, prod]
