@@ -15,6 +15,7 @@ jobs:
     strategy:
       matrix:
         env: [dev, stage, prod]
+      max-parallel: 1  # Ensures jobs run one at a time
 
     steps:
       - name: Checkout repository
@@ -41,7 +42,7 @@ jobs:
       - name: Terraform Plan (${{ matrix.env }})
         run: terraform plan -var-file=envs/${{ matrix.env }}.tfvars
 
-      # Uncomment the next step if you want to apply automatically
+      # Uncomment this step to apply automatically
       # - name: Terraform Apply (${{ matrix.env }})
       #   run: terraform apply -var-file=envs/${{ matrix.env }}.tfvars -auto-approve
 
