@@ -1,4 +1,4 @@
-name: Multi-Environment Terraform Deployment
+name: Prod Terraform Deployment
 
 on:
   push:
@@ -9,13 +9,8 @@ permissions:
   contents: read
 
 jobs:
-  terraform:
+  terraform-prod:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        env: [dev, stage, prod]
-      max-parallel: 1  # Ensures jobs run one at a time
 
     steps:
       - name: Checkout repository
@@ -33,18 +28,18 @@ jobs:
         with:
           terraform_version: "1.8.4"
 
-      - name: Terraform Init (${{ matrix.env }})
-        run: terraform init -backend-config=backend/${{ matrix.env }}.tf
+      - name: Terraform Init (prod)
+        run: terraform init -backend-config=backend/prod.tf
 
-      - name: Terraform Validate (${{ matrix.env }})
+      - name: Terraform Validate (prod)
         run: terraform validate
 
-      - name: Terraform Plan (${{ matrix.env }})
-        run: terraform plan -var-file=envs/${{ matrix.env }}.tfvars
+      - name: Terraform Plan (prod)
+        run: terraform plan -var-file=envs/prod.tfvars
 
-      # Uncomment this step to apply automatically
-      # - name: Terraform Apply (${{ matrix.env }})
-      #   run: terraform apply -var-file=envs/${{ matrix.env }}.tfvars -auto-approve
+      # Uncomment the next step if you want to apply automatically
+      # - name: Terraform Apply (prod)
+      #   run: terraform apply -var-file=envs/prod.tfvars -auto-approve
 
 
 # name: Dev Deployment
