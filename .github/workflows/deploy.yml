@@ -37,8 +37,8 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var-file=envs/dev.tfvars
 
-      # - name: Terraform Apply
-      #   run: terraform apply -var-file=envs/dev.tfvars -auto-approve
+      - name: Terraform Apply
+        run: terraform apply -var-file=envs/dev.tfvars -auto-approve
 
     #   - name: Update Kubeconfig
     #     run: |
@@ -68,5 +68,5 @@ jobs:
     #       kubectl apply -f sanity-test/service.yaml -n sanity-test
     #       kubectl get svc -n sanity-test
 
-      - name: Terraform Destroy
-        run: terraform destroy -var-file=envs/dev.tfvars -auto-approve
+      # - name: Terraform Destroy
+      #   run: terraform destroy -var-file=envs/dev.tfvars -auto-approve
