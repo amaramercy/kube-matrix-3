@@ -57,7 +57,7 @@ eks_disk_size                  = 30
 # ---------------------------------------
 aurora_database_name          = "km_dev"
 aurora_master_username        = "mysqladmin"
-aurora_master_password        = "DevSecureDBPass123!"   # ✅ Corrected password
+aurora_master_password        = "DevSecureDBPass123"   # ✅ Corrected password
 aurora_engine_version         = "8.0.mysql_aurora.3.08.2"
 
 aurora_min_capacity           = 0.5
