@@ -37,49 +37,45 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var-file=envs/dev.tfvars
 
-      - name: Terraform Apply
-        run: terraform apply -var-file=envs/dev.tfvars -auto-approve
+      # - name: Terraform Apply
+      #   run: terraform apply -var-file=envs/dev.tfvars -auto-approve
 
       # ---------------------------
       # Kubernetes setup & sanity test
       # ---------------------------
 
-      - name: Install kubectl
-        run: |
-          curl -LO https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
-
-      - name: Update Kubeconfig
-        run: |
-          CLUSTER_NAME=$(terraform output -raw eks_cluster_name)
-          aws eks update-kubeconfig --region us-east-1 --name $CLUSTER_NAME
-          kubectl get nodes
-
-      - name: Create sanity-test namespace
-        run: |
-          kubectl create namespace sanity-test || echo "Namespace already exists"
-          kubectl get ns
-
-      - name: Deploy NGINX Deployment
-        run: |
-          kubectl apply -f sanity-test/nginx-deploy.yaml -n sanity-test
-          kubectl get pods -n sanity-test
-
-      - name: Deploy LoadBalancer Service
-        run: |
-          kubectl apply -f sanity-test/service.yaml -n sanity-test
-          kubectl get svc -n sanity-test
-
-      # ---------------------------
-      # ⚠️ DANGER ZONE
-      # Uncomment ONLY when you want to destroy EVERYTHING
-      # ---------------------------
-
-      # - name: Terraform Destroy
+      # - name: Install kubectl
       #   run: |
-      #     echo "⚠️ DESTROYING ALL INFRASTRUCTURE"
-      #     terraform destroy -var-file=envs/dev.tfvars -auto-approve
+      #     curl -LO https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+      #     chmod +x kubectl
+      #     sudo mv kubectl /usr/local/bin/
+
+      # - name: Update Kubeconfig
+      #   run: |
+      #     CLUSTER_NAME=$(terraform output -raw eks_cluster_name)
+      #     aws eks update-kubeconfig --region us-east-1 --name $CLUSTER_NAME
+      #     kubectl get nodes
+
+      # - name: Create sanity-test namespace
+      #   run: |
+      #     kubectl create namespace sanity-test || echo "Namespace already exists"
+      #     kubectl get ns
+
+      # - name: Deploy NGINX Deployment
+      #   run: |
+      #     kubectl apply -f sanity-test/nginx-deploy.yaml -n sanity-test
+      #     kubectl get pods -n sanity-test
+
+      # - name: Deploy LoadBalancer Service
+      #   run: |
+      #     kubectl apply -f sanity-test/service.yaml -n sanity-test
+      #     kubectl get svc -n sanity-test
+
+     
+      - name: Terraform Destroy
+        run: |
+          echo "⚠️ DESTROYING ALL INFRASTRUCTURE"
+          terraform destroy -var-file=envs/dev.tfvars -auto-approve
 
 
 
